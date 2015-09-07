@@ -15,13 +15,13 @@ import (
 var showTestSql = true
 
 func newTidbEngine() (*xorm.Engine, error) {
-	os.Remove("./tidb.db")
-	return xorm.NewEngine("tidb", "goleveldb://./tidb.db")
+	os.Remove("./tidb")
+	return xorm.NewEngine("tidb", "goleveldb://./tidb")
 }
 
 func newTidbDriverDB() (*sql.DB, error) {
-	os.Remove("./tidb.db")
-	return sql.Open("tidb", "goleveldb://./tidb.db")
+	os.Remove("./tidb")
+	return sql.Open("tidb", "goleveldb://./tidb")
 }
 
 func newCache() core.Cacher {

@@ -5,8 +5,9 @@
 package tidb
 
 import (
-	"strings"
 	"errors"
+	"path"
+	"strings"
 
 	"github.com/go-xorm/core"
 )
@@ -37,9 +38,10 @@ func (p *tidbDriver) Parse(driverName, dataSourceName string) (*core.Uri, error)
 		return nil, errors.New(params[0] + " is not supported yet.")
 	}
 
+	dbname := path.Base(params[1])
 	uri := &core.Uri{
 		DbType: DBType,
-		DbName: params[1],
+		DbName: dbname,
 	}
 
 	return uri, nil

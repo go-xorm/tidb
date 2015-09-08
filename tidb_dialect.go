@@ -25,8 +25,7 @@ func (db *tidb) SqlType(c *core.Column) string {
 	var res string
 	switch t := c.SQLType.Name; t {
 	case core.Bool:
-		res = core.TinyInt
-		c.Length = 1
+		res = core.Bool
 	case core.Serial:
 		c.IsAutoIncrement = true
 		c.IsPrimaryKey = true

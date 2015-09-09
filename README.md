@@ -15,9 +15,9 @@ import (
 )
 
 // for goleveldb as store
-xorm.NewEngine("tidb", "goleveldb://./tidb.db")
+xorm.NewEngine("tidb", "goleveldb://./tidb")
 // for memory as store
 xorm.NewEngine("tidb", "memory://tidb")
 // for boltdb as store
-xorm.NewEngine("tidb", "boltdb://./tidb.db")
+xorm.NewEngine("tidb", "boltdb://./tidb")
 ```

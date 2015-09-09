@@ -1,11 +1,7 @@
 tidb driver and dialect for github.com/go-xorm/xorm
 ========
 
-** experiment support **
-
-STATUS: build pass but some tests failed.
-
-Currently, we can support tidb for some operations.
+Currently, we can support tidb for allmost all the operations.
 
 # How to use
 
@@ -20,6 +16,10 @@ import (
     "github.com/go-xorm/xorm"
 )
 
-// for open a file
+// for goleveldb as store
 xorm.NewEngine("tidb", "goleveldb://./tidb.db")
+// for memory as store
+xorm.NewEngine("tidb", "memory://tidb")
+// for boltdb as store
+xorm.NewEngine("tidb", "boltdb://./tidb.db")
 ```

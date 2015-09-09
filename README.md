@@ -7,8 +7,6 @@ Currently, we can support tidb for allmost all the operations.
 
 Just like other supports of xorm, but you should import the three packages:
 
-Since github.com/cznic/ql# has not been resolved, we just use github.com/lunny/ql instead.
-
 ```Go
 import (
     _ "github.com/pingcap/tidb"

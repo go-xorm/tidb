@@ -14,14 +14,24 @@ import (
 
 var showTestSql = true
 
-func newTidbEngine() (*xorm.Engine, error) {
-	os.Remove("./tidb")
-	return xorm.NewEngine("tidb", "goleveldb://./tidb")
+// [memory, goleveldb, boltdb]
+
+func newTidbEngine(storeType string) (*xorm.Engine, error) {
+	if storeType == "memory" {
+		return xorm.NewEngine("tidb", storeType+"://tidb")
+	}
+
+	os.Remove("./tidb_"+storeType)
+	return xorm.NewEngine("tidb", storeType+"://./tidb_"+storeType)
 }
 
-func newTidbDriverDB() (*sql.DB, error) {
-	os.Remove("./tidb")
-	return sql.Open("tidb", "goleveldb://./tidb")
+func newTidbDriverDB(storeType string) (*sql.DB, error) {
+	if storeType == "memory" {
+		return sql.Open("tidb", storeType+"://./tidb")
+	}
+
+	os.Remove("./tidb_"+storeType)
+	return sql.Open("tidb", storeType+"://./tidb_"+storeType)
 }
 
 func newCache() core.Cacher {
@@ -38,8 +48,8 @@ func setEngine(engine *xorm.Engine, useCache bool) {
 	engine.ShowDebug = showTestSql
 }
 
-func TestTidbNoCache(t *testing.T) {
-	engine, err := newTidbEngine()
+func TestTidbGoLevelDBNoCache(t *testing.T) {
+	engine, err := newTidbEngine("goleveldb")
 	if err != nil {
 		t.Error(err)
 		return
@@ -52,8 +62,64 @@ func TestTidbNoCache(t *testing.T) {
 	tests.BaseTestAll3(engine, t)
 }
 
-func TestTidbWithCache(t *testing.T) {
-	engine, err := newTidbEngine()
+func TestTidbGoLevelDBWithCache(t *testing.T) {
+	engine, err := newTidbEngine("goleveldb")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	defer engine.Close()
+
+	setEngine(engine, true)
+
+	tests.BaseTestAll(engine, t)
+	tests.BaseTestAll2(engine, t)
+}
+
+func TestTidbMemoryNoCache(t *testing.T) {
+	engine, err := newTidbEngine("memory")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	defer engine.Close()
+	setEngine(engine, false)
+
+	tests.BaseTestAll(engine, t)
+	tests.BaseTestAll2(engine, t)
+	tests.BaseTestAll3(engine, t)
+}
+
+func TestTidbMemoryWithCache(t *testing.T) {
+	engine, err := newTidbEngine("memory")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	defer engine.Close()
+
+	setEngine(engine, true)
+
+	tests.BaseTestAll(engine, t)
+	tests.BaseTestAll2(engine, t)
+}
+
+func TestTidbBoltDBNoCache(t *testing.T) {
+	engine, err := newTidbEngine("boltdb")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	defer engine.Close()
+	setEngine(engine, false)
+
+	tests.BaseTestAll(engine, t)
+	tests.BaseTestAll2(engine, t)
+	tests.BaseTestAll3(engine, t)
+}
+
+func TestTidbBoltDBWithCache(t *testing.T) {
+	engine, err := newTidbEngine("boltdb")
 	if err != nil {
 		t.Error(err)
 		return
@@ -72,18 +138,22 @@ const (
 )
 
 func BenchmarkTidbDriverInsert(t *testing.B) {
-	tests.DoBenchDriver(newTidbDriverDB, createTableQl, dropTableQl,
+	tests.DoBenchDriver(func() (*sql.DB, error) {
+			return newTidbDriverDB("goleveldb")
+		}, createTableQl, dropTableQl,
 		tests.DoBenchDriverInsert, t)
 }
 
 func BenchmarkTidbDriverFind(t *testing.B) {
-	tests.DoBenchDriver(newTidbDriverDB, createTableQl, dropTableQl,
+	tests.DoBenchDriver(func() (*sql.DB, error) {
+			return newTidbDriverDB("goleveldb")
+		}, createTableQl, dropTableQl,
 		tests.DoBenchDriverFind, t)
 }
 
 func BenchmarkTidbNoCacheInsert(t *testing.B) {
 	t.StopTimer()
-	engine, err := newTidbEngine()
+	engine, err := newTidbEngine("goleveldb")
 	if err != nil {
 		t.Error(err)
 		return
@@ -95,7 +165,7 @@ func BenchmarkTidbNoCacheInsert(t *testing.B) {
 
 func BenchmarkTidbNoCacheFind(t *testing.B) {
 	t.StopTimer()
-	engine, err := newTidbEngine()
+	engine, err := newTidbEngine("goleveldb")
 	if err != nil {
 		t.Error(err)
 		return
@@ -108,7 +178,7 @@ func BenchmarkTidbNoCacheFind(t *testing.B) {
 
 func BenchmarkTidbNoCacheFindPtr(t *testing.B) {
 	t.StopTimer()
-	engine, err := newTidbEngine()
+	engine, err := newTidbEngine("goleveldb")
 	if err != nil {
 		t.Error(err)
 		return
@@ -120,7 +190,7 @@ func BenchmarkTidbNoCacheFindPtr(t *testing.B) {
 
 func BenchmarkTidbCacheInsert(t *testing.B) {
 	t.StopTimer()
-	engine, err := newTidbEngine()
+	engine, err := newTidbEngine("goleveldb")
 	if err != nil {
 		t.Error(err)
 		return
@@ -133,7 +203,7 @@ func BenchmarkTidbCacheInsert(t *testing.B) {
 
 func BenchmarkTidbCacheFind(t *testing.B) {
 	t.StopTimer()
-	engine, err := newTidbEngine()
+	engine, err := newTidbEngine("goleveldb")
 	if err != nil {
 		t.Error(err)
 		return
@@ -146,7 +216,7 @@ func BenchmarkTidbCacheFind(t *testing.B) {
 
 func BenchmarkTidbCacheFindPtr(t *testing.B) {
 	t.StopTimer()
-	engine, err := newTidbEngine()
+	engine, err := newTidbEngine("goleveldb")
 	if err != nil {
 		t.Error(err)
 		return

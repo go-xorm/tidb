@@ -34,7 +34,7 @@ func (p *tidbDriver) Parse(driverName, dataSourceName string) (*core.Uri, error)
 		return nil, errors.New("params error")
 	}
 
-	if params[0] != "goleveldb" {
+	if params[0] != "goleveldb" && params[0] != "memory" && params[0] != "boltdb" {
 		return nil, errors.New(params[0] + " is not supported yet.")
 	}
 

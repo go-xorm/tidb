@@ -31,7 +31,7 @@ func newTidbDriverDB(storeType string) (*sql.DB, error) {
 	}
 
 	os.Remove("./tidb_" + storeType)
-	return sql.Open("tidb", storeType+"://./tidb_"+storeType+"tidb")
+	return sql.Open("tidb", storeType+"://./tidb_"+storeType+"/tidb")
 }
 
 func newCache() core.Cacher {

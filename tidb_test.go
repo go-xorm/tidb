@@ -18,20 +18,20 @@ var showTestSql = true
 
 func newTidbEngine(storeType string) (*xorm.Engine, error) {
 	if storeType == "memory" {
-		return xorm.NewEngine("tidb", storeType+"://tidb")
+		return xorm.NewEngine("tidb", storeType+"://tidb/tidb")
 	}
 
-	os.Remove("./tidb_"+storeType)
-	return xorm.NewEngine("tidb", storeType+"://./tidb_"+storeType)
+	os.Remove("./tidb_" + storeType)
+	return xorm.NewEngine("tidb", storeType+"://./tidb_"+storeType+"/tidb")
 }
 
 func newTidbDriverDB(storeType string) (*sql.DB, error) {
 	if storeType == "memory" {
-		return sql.Open("tidb", storeType+"://./tidb")
+		return sql.Open("tidb", storeType+"://./tidb/tidb")
 	}
 
-	os.Remove("./tidb_"+storeType)
-	return sql.Open("tidb", storeType+"://./tidb_"+storeType)
+	os.Remove("./tidb_" + storeType)
+	return sql.Open("tidb", storeType+"://./tidb_"+storeType+"/tidb")
 }
 
 func newCache() core.Cacher {
@@ -139,15 +139,15 @@ const (
 
 func BenchmarkTidbDriverInsert(t *testing.B) {
 	tests.DoBenchDriver(func() (*sql.DB, error) {
-			return newTidbDriverDB("goleveldb")
-		}, createTableQl, dropTableQl,
+		return newTidbDriverDB("goleveldb")
+	}, createTableQl, dropTableQl,
 		tests.DoBenchDriverInsert, t)
 }
 
 func BenchmarkTidbDriverFind(t *testing.B) {
 	tests.DoBenchDriver(func() (*sql.DB, error) {
-			return newTidbDriverDB("goleveldb")
-		}, createTableQl, dropTableQl,
+		return newTidbDriverDB("goleveldb")
+	}, createTableQl, dropTableQl,
 		tests.DoBenchDriverFind, t)
 }
 

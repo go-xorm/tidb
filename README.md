@@ -14,10 +14,11 @@ import (
     "github.com/go-xorm/xorm"
 )
 
+//The formate of DataSource name is store://uri/dbname
 // for goleveldb as store
-xorm.NewEngine("tidb", "goleveldb://./tidb")
+xorm.NewEngine("tidb", "goleveldb://./tidb/tidb")
 // for memory as store
-xorm.NewEngine("tidb", "memory://tidb")
+xorm.NewEngine("tidb", "memory://tidb/tidb")
 // for boltdb as store
-xorm.NewEngine("tidb", "boltdb://./tidb")
+xorm.NewEngine("tidb", "boltdb://./tidb/tidb")
 ```

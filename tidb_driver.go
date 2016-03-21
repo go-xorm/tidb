@@ -6,8 +6,8 @@ package tidb
 
 import (
 	"errors"
-	"path"
-	"strings"
+	"net/url"
+	"path/filepath"
 
 	"github.com/go-xorm/core"
 )
@@ -29,19 +29,19 @@ type tidbDriver struct {
 }
 
 func (p *tidbDriver) Parse(driverName, dataSourceName string) (*core.Uri, error) {
-	params := strings.Split(dataSourceName, "://")
-	if len(params) < 2 {
-		return nil, errors.New("params error")
+	u, err := url.Parse(dataSourceName)
+	if err != nil {
+		return nil, err
 	}
-
-	if params[0] != "goleveldb" && params[0] != "memory" && params[0] != "boltdb" {
-		return nil, errors.New(params[0] + " is not supported yet.")
+	if u.Scheme != "goleveldb" && u.Scheme != "memory" && u.Scheme != "boltdb" {
+		return nil, errors.New(u.Scheme + " is not supported yet.")
 	}
+	path := filepath.Join(u.Host, u.Path)
+	dbName := filepath.Clean(filepath.Base(path))
 
-	dbname := path.Base(params[1])
 	uri := &core.Uri{
 		DbType: DBType,
-		DbName: dbname,
+		DbName: dbName,
 	}
 
 	return uri, nil

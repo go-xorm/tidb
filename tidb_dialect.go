@@ -137,9 +137,7 @@ func (db *tidb) GetColumns(tableName string) ([]string, map[string]*core.Column,
 		" `COLUMN_KEY`, `EXTRA` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?"
 
 	rows, err := db.DB().Query(s, args...)
-	if db.Logger != nil {
-		db.Logger.Info("[sql]", s, args)
-	}
+	db.LogSQL(s, args)
 
 	if err != nil {
 		return nil, nil, err
@@ -249,9 +247,7 @@ func (db *tidb) GetTables() ([]*core.Table, error) {
 		"`INFORMATION_SCHEMA`.`TABLES` WHERE `TABLE_SCHEMA`=? AND (`ENGINE`='MyISAM' OR `ENGINE` = 'InnoDB')"
 
 	rows, err := db.DB().Query(s, args...)
-	if db.Logger != nil {
-		db.Logger.Info("[sql]", s, args)
-	}
+	db.LogSQL(s, args)
 	if err != nil {
 		return nil, err
 	}
@@ -279,9 +275,7 @@ func (db *tidb) GetIndexes(tableName string) (map[string]*core.Index, error) {
 	s := "SELECT `INDEX_NAME`, `NON_UNIQUE`, `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`STATISTICS` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?"
 
 	rows, err := db.DB().Query(s, args...)
-	if db.Logger != nil {
-		db.Logger.Info("[sql]", s, args)
-	}
+	db.LogSQL(s, args)
 	if err != nil {
 		return nil, err
 	}

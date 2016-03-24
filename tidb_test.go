@@ -18,20 +18,20 @@ var showTestSql = true
 
 func newTidbEngine(storeType string) (*xorm.Engine, error) {
 	if storeType == "memory" {
-		return xorm.NewEngine("tidb", storeType+"://tidb/tidb")
+		return xorm.NewEngine("tidb", storeType+"://tidb/tidb?parseTime=true")
 	}
 
 	os.Remove("./tidb_" + storeType)
-	return xorm.NewEngine("tidb", storeType+"://./tidb_"+storeType+"/tidb")
+	return xorm.NewEngine("tidb", storeType+"://./tidb_"+storeType+"/tidb?parseTime=true")
 }
 
 func newTidbDriverDB(storeType string) (*sql.DB, error) {
 	if storeType == "memory" {
-		return sql.Open("tidb", storeType+"://./tidb/tidb")
+		return sql.Open("tidb", storeType+"://./tidb/tidb?parseTime=true")
 	}
 
 	os.Remove("./tidb_" + storeType)
-	return sql.Open("tidb", storeType+"://./tidb_"+storeType+"/tidb")
+	return sql.Open("tidb", storeType+"://./tidb_"+storeType+"/tidb?parseTime=true")
 }
 
 func newCache() core.Cacher {
@@ -42,10 +42,8 @@ func setEngine(engine *xorm.Engine, useCache bool) {
 	if useCache {
 		engine.SetDefaultCacher(newCache())
 	}
-	engine.ShowSQL = showTestSql
-	engine.ShowErr = showTestSql
-	engine.ShowWarn = showTestSql
-	engine.ShowDebug = showTestSql
+	engine.Logger().ShowSQL(showTestSql)
+	engine.Logger().SetLevel(core.LOG_DEBUG)
 }
 
 func TestTidbGoLevelDBNoCache(t *testing.T) {

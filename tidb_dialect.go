@@ -148,7 +148,7 @@ func (db *tidb) GetColumns(tableName string) ([]string, map[string]*core.Column,
 	colSeq := make([]string, 0)
 	for rows.Next() {
 		col := new(core.Column)
-		col.Indexes = make(map[string]bool)
+		col.Indexes = make(map[string]int)
 
 		var columnName, isNullable, colType, colKey, extra string
 		var colDefault *string
